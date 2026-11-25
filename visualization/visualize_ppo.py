@@ -2,129 +2,278 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+from matplotlib.animation import FuncAnimation, PillowWriter
 from stable_baselines3 import PPO
+
 from environment.uav_env import UAVEnv
 
 
+# --------------------------------------------------
 # 1. Load the trained PPO model
+# --------------------------------------------------
+
 model = PPO.load("training/uav_ppo_model")
 
+# --------------------------------------------------
 # 2. Create and reset the environment
+# --------------------------------------------------
+
 env = UAVEnv()
-observation, info = env.reset()
+obs, info = env.reset()
 
-# Store the initial position and distance
-positions = [[env.uav.x, env.uav.y]]
+# --------------------------------------------------
+# 3. Store UAV flight data
+# --------------------------------------------------
+
+positions = [(env.uav.x, env.uav.y)]
 distances = [env.calculate_distance()]
+# Store reward at every timestep
+rewards = []
 
-terminated = False
-truncated = False
-total_reward = 0.0
-steps = 0
+velocities = [
+    np.sqrt(env.uav.vx**2 + env.uav.vy**2)
+]
 
-# 3. Run the trained policy
-while not (terminated or truncated):
+dt = 0.1
 
-    action, _ = model.predict(
-        observation,
-        deterministic=True
-    )
+# --------------------------------------------------
+# 4. Run the trained PPO policy
+# --------------------------------------------------
 
-    observation, reward, terminated, truncated, info = env.step(action)
+for step in range(env.max_steps):
 
-    # Record UAV position after each step
-    positions.append([env.uav.x, env.uav.y])
+    action, _ = model.predict(obs, deterministic=True)
 
-    # Record distance from target
-    distances.append(info["distance"])
+    obs, reward, terminated, truncated, info = env.step(action)
+    # Save the reward received at this timestep
+    rewards.append(reward)
 
-    total_reward += reward
-    steps += 1
+    positions.append((env.uav.x, env.uav.y))
 
+    distances.append(env.calculate_distance())
 
-# 4. Convert recorded data into NumPy arrays
+    speed = np.sqrt(env.uav.vx**2 + env.uav.vy**2)
+    velocities.append(speed)
+
+    if terminated or truncated:
+        break
+
+env.close()
+
 positions = np.array(positions)
 distances = np.array(distances)
+velocities = np.array(velocities)
+rewards = np.array(rewards)
 
-dt = env.uav.dt
-time = np.arange(len(distances)) * dt
+# Running total of rewards
+cumulative_rewards = np.cumsum(rewards)
 
-start = positions[0]
-final = positions[-1]
+# --------------------------------------------------
+# 5. Target position
+# --------------------------------------------------
 
-target_x = env.target_x
-target_y = env.target_y
+target_x = 10.0
+target_y = 10.0
 
+# --------------------------------------------------
+# 6. Create animation figure
+# --------------------------------------------------
 
-# 5. Create two plots
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+fig, ax = plt.subplots(figsize=(8, 7))
 
+ax.set_title("PPO UAV Target Navigation")
+ax.set_xlabel("X Position (m)")
+ax.set_ylabel("Y Position (m)")
 
-# Plot 1: UAV trajectory
-axes[0].plot(
-    positions[:, 0],
-    positions[:, 1],
+ax.grid(True)
+ax.set_aspect("equal", adjustable="box")
+
+padding = 1.5
+
+ax.set_xlim(
+    min(positions[:, 0].min(), target_x) - padding,
+    max(positions[:, 0].max(), target_x) + padding
+)
+
+ax.set_ylim(
+    min(positions[:, 1].min(), target_y) - padding,
+    max(positions[:, 1].max(), target_y) + padding
+)
+
+# --------------------------------------------------
+# 7. Draw target
+# --------------------------------------------------
+
+ax.scatter(
+    target_x,
+    target_y,
+    color="red",
+    marker="*",
+    s=250,
+    label="Target"
+)
+
+# --------------------------------------------------
+# 8. Create trajectory line
+# --------------------------------------------------
+
+trajectory_line, = ax.plot(
+    [],
+    [],
+    color="blue",
+    linewidth=2,
     label="UAV trajectory"
 )
 
-axes[0].scatter(
-    start[0], start[1],
-    color="green", marker="o",
-    s=100, label="Start"
+# --------------------------------------------------
+# 9. Create moving UAV marker
+# --------------------------------------------------
+
+uav_marker, = ax.plot(
+    [],
+    [],
+    marker="o",
+    color="blue",
+    markersize=10,
+    label="UAV"
 )
 
-axes[0].scatter(
-    target_x, target_y,
-    color="red", marker="*",
-    s=200, label="Target"
+status_text = ax.text(
+    0.02,
+    0.96,
+    "",
+    transform=ax.transAxes,
+    verticalalignment="top",
+    fontsize=10,
+    bbox=dict(facecolor="white", alpha=0.8)
 )
 
-axes[0].scatter(
-    final[0], final[1],
-    color="blue", marker="x",
-    s=100, label="Final position"
+ax.legend(loc="lower right")
+
+# --------------------------------------------------
+# 10. Initialize animation
+# --------------------------------------------------
+
+def init():
+
+    trajectory_line.set_data([], [])
+    uav_marker.set_data([], [])
+    status_text.set_text("")
+
+    return trajectory_line, uav_marker, status_text
+
+# --------------------------------------------------
+# 11. Update each animation frame
+# --------------------------------------------------
+
+def update(frame):
+
+    trajectory_line.set_data(
+        positions[:frame + 1, 0],
+        positions[:frame + 1, 1]
+    )
+
+    uav_marker.set_data(
+        [positions[frame, 0]],
+        [positions[frame, 1]]
+    )
+
+    elapsed_time = frame * dt
+
+    status_text.set_text(
+        f"Time: {elapsed_time:.1f} s\n"
+        f"Distance: {distances[frame]:.3f} m\n"
+        f"Speed: {velocities[frame]:.3f} m/s\n"
+        f"Step: {frame}"
+    )
+
+    return trajectory_line, uav_marker, status_text
+
+# --------------------------------------------------
+# 12. Generate animation
+# --------------------------------------------------
+
+animation = FuncAnimation(
+    fig,
+    update,
+    frames=len(positions),
+    init_func=init,
+    interval=100,
+    blit=True,
+    repeat=True
 )
 
-axes[0].set_title("PPO UAV Trajectory")
-axes[0].set_xlabel("X Position (m)")
-axes[0].set_ylabel("Y Position (m)")
-axes[0].legend()
+# --------------------------------------------------
+# 13. Save GIF
+# --------------------------------------------------
+
+animation.save(
+    "visualization/ppo_flight.gif",
+    writer=PillowWriter(fps=10)
+)
+
+print("\nGIF successfully saved!")
+print(f"Total frames: {len(positions)}")
+print(f"Final distance: {distances[-1]:.3f} m")
+print(f"Final speed: {velocities[-1]:.3f} m/s")
+
+
+# --------------------------------------------------
+# 14. Plot reward performance
+# --------------------------------------------------
+
+time_steps = np.arange(1, len(rewards) + 1) * dt
+
+fig_reward, axes = plt.subplots(2, 1, figsize=(10, 8))
+
+# Graph 1: Reward per timestep
+axes[0].plot(
+    time_steps,
+    rewards,
+    color="blue",
+    linewidth=1.5,
+    label="Step reward"
+)
+
+axes[0].axhline(
+    y=0,
+    color="black",
+    linestyle="--",
+    linewidth=0.8
+)
+
+axes[0].set_title("Reward per Timestep")
+axes[0].set_xlabel("Time (seconds)")
+axes[0].set_ylabel("Reward")
 axes[0].grid(True)
-axes[0].axis("equal")
+axes[0].legend()
 
-
-# Plot 2: Distance from target over time
+# Graph 2: Cumulative reward
 axes[1].plot(
-    time,
-    distances,
-    label="Distance to target"
+    time_steps,
+    cumulative_rewards,
+    color="green",
+    linewidth=2,
+    label="Cumulative reward"
 )
 
-axes[1].set_title("Distance vs Time")
+axes[1].set_title("Cumulative Reward During UAV Flight")
 axes[1].set_xlabel("Time (seconds)")
-axes[1].set_ylabel("Distance (m)")
-axes[1].legend()
+axes[1].set_ylabel("Total reward")
 axes[1].grid(True)
+axes[1].legend()
 
+fig_reward.tight_layout()
 
-# 6. Display results
-plt.tight_layout()
-
-plt.savefig(
-    "visualization/ppo_trajectory_analysis.png",
-    dpi=300
+# Save reward graphs
+fig_reward.savefig(
+    "visualization/ppo_reward_analysis.png",
+    dpi=300,
+    bbox_inches="tight"
 )
+
+print("Reward graph saved: visualization/ppo_reward_analysis.png")
+print(f"Total episode reward: {np.sum(rewards):.3f}")
 
 plt.show()
 
-print("\n========== TRAJECTORY RESULTS ==========")
-print("Total steps:", steps)
-print("Total simulation time:", round(steps * dt, 2), "seconds")
-print("Total reward:", round(total_reward, 2))
-print("Final X position:", round(final[0], 3))
-print("Final Y position:", round(final[1], 3))
-print("Final distance:", round(distances[-1], 3), "m")
-print("Final velocity:", round(info["velocity"], 3), "m/s")
-print("Success:", info["success"])
-
-env.close()
