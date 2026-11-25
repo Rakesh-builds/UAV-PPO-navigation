@@ -138,7 +138,9 @@ Quantitative generalization results should be added after reviewing the evaluati
 **Experiment C — External disturbances**
 
 Created trajectory and distance visualizations for a wind-like disturbance experiment. The disturbance implementation requires validation so that the disturbance is incorporated before reward and termination calculations. Therefore, these plots should be treated as preliminary rather than validated robustness results.
-
+![Experiment C trajectory](goal_7/experiment_c_trajectory.png)
+![Experiment C distance](goal_7/experiment_c_distance.png)
+*Preliminary results: the disturbance model still needs validation, so these plots are not a confirmed robustness result.*
 ## Repository Structure
 
 ```text
