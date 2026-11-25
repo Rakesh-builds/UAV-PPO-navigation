@@ -132,6 +132,8 @@ Compared PPO checkpoints trained for approximately 20K and 100K timesteps. Train
 Tested the trained policy against several target positions other than the original (10, 10). Trajectory and distance plots were generated in `goal_7/`.
 
 Quantitative generalization results should be added after reviewing the evaluation output.
+![Experiment B trajectories](goal_7/experiment_b_trajectories.png)
+![Experiment B distance](goal_7/experiment_b_distance.png)
 
 **Experiment C — External disturbances**
 
@@ -185,8 +187,8 @@ UAV_RL_PROJECT/
 Clone the repository:
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd UAV_RL_PROJECT
+git clone <https://github.com/Rakesh-builds/UAV-PPO-navigation.git>
+cd cd UAV-PPO-navigation
 ```
 
 Create and activate a virtual environment:
