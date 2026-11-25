@@ -3,7 +3,7 @@ import gymnasium as gym
 import numpy as np
 from gymnasium import spaces
 
-from goal_1.uav_dynamics import UAV
+from dynamics.uav_dynamics import UAV
 
 
 class UAVEnv(gym.Env):

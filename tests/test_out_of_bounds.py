@@ -1,5 +1,5 @@
 
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 def run_test(test_name, x, y):

@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from stable_baselines3 import PPO
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 # Load the existing 100K PPO model
-model = PPO.load("goal_7/uav_ppo_100k")
+model = PPO.load("experiments/uav_ppo_100k")
 
 # Simulation settings
 WIND_ACCELERATION = 0.5
@@ -172,7 +172,7 @@ plt.grid(True)
 plt.legend()
 plt.tight_layout()
 
-plt.savefig("goal_7/experiment_c_trajectory.png", dpi=300)
+plt.savefig("experiments/experiment_c_trajectory.png", dpi=300)
 
 
 # =====================================
@@ -218,9 +218,9 @@ plt.grid(True)
 plt.legend()
 plt.tight_layout()
 
-plt.savefig("goal_7/experiment_c_distance.png", dpi=300)
+plt.savefig("experiments/experiment_c_distance.png", dpi=300)
 
 plt.show()
 
 print("\nExperiment C completed!")
-print("Graphs saved in goal_7/")
+print("Graphs saved in experiments/")

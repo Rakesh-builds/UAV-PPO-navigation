@@ -1,6 +1,6 @@
 
 from stable_baselines3 import PPO
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 # Create environment
@@ -27,7 +27,7 @@ print("\n========== TRAINING: 20K CHECKPOINT ==========")
 model.learn(total_timesteps=20_000)
 
 # Save the 20K checkpoint
-model.save("goal_7/uav_ppo_20k_comparison")
+model.save("experiments/uav_ppo_20k_comparison")
 
 print("\n20K checkpoint saved!")
 
@@ -41,7 +41,7 @@ model.learn(
 )
 
 # Save the 100K checkpoint
-model.save("goal_7/uav_ppo_100k")
+model.save("experiments/uav_ppo_100k")
 
 print("\n100K checkpoint saved!")
 print("Experiment A training completed!")

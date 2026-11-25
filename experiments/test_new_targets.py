@@ -1,11 +1,11 @@
 
 import matplotlib.pyplot as plt
 from stable_baselines3 import PPO
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 # Load trained PPO model
-model = PPO.load("goal_7/uav_ppo_100k")
+model = PPO.load("experiments/uav_ppo_100k")
 
 # Unseen target positions
 targets = [
@@ -149,7 +149,7 @@ plt.axis("equal")
 plt.legend()
 plt.tight_layout()
 
-plt.savefig("goal_7/experiment_b_trajectories.png", dpi=300)
+plt.savefig("experiments/experiment_b_trajectories.png", dpi=300)
 
 
 # =====================================
@@ -177,12 +177,12 @@ plt.grid(True)
 plt.legend()
 plt.tight_layout()
 
-plt.savefig("goal_7/experiment_b_distance.png", dpi=300)
+plt.savefig("experiments/experiment_b_distance.png", dpi=300)
 
 plt.show()
 
 env.close()
 
 print("\nGraphs saved successfully!")
-print("1. goal_7/experiment_b_trajectories.png")
-print("2. goal_7/experiment_b_distance.png")
+print("1. experiments/experiment_b_trajectories.png")
+print("2. experiments/experiment_b_distance.png")

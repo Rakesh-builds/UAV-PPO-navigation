@@ -1,7 +1,7 @@
 
 from gymnasium.utils.env_checker import check_env
 
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 env = UAVEnv()
 

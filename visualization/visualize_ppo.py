@@ -3,11 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from stable_baselines3 import PPO
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 # 1. Load the trained PPO model
-model = PPO.load("goal_4/uav_ppo_model")
+model = PPO.load("training/uav_ppo_model")
 
 # 2. Create and reset the environment
 env = UAVEnv()
@@ -111,7 +111,7 @@ axes[1].grid(True)
 plt.tight_layout()
 
 plt.savefig(
-    "goal_6/ppo_trajectory_analysis.png",
+    "visualization/ppo_trajectory_analysis.png",
     dpi=300
 )
 

@@ -1,10 +1,10 @@
 
 from stable_baselines3 import PPO
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 # Load trained PPO model
-model = PPO.load("goal_4/uav_ppo_model")
+model = PPO.load("training/uav_ppo_model")
 
 # Create UAV environment
 env = UAVEnv()

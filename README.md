@@ -117,9 +117,9 @@ All ten episodes used the same initial conditions and target position. These res
 ### Trajectory Visualization
 
 The trajectory and distance plots are available in:
-![PPO trajectory analysis](goal_6/ppo_trajectory_analysis.png)
+![PPO trajectory analysis](visualization/ppo_trajectory_analysis.png)
 
-`goal_6/ppo_trajectory_analysis.png`
+`visualization/ppo_trajectory_analysis.png`
 
 ### Additional Experiments
 
@@ -129,49 +129,49 @@ Compared PPO checkpoints trained for approximately 20K and 100K timesteps. Train
 
 **Experiment B — Unseen target positions**
 
-Tested the trained policy against several target positions other than the original (10, 10). Trajectory and distance plots were generated in `goal_7/`.
+Tested the trained policy against several target positions other than the original (10, 10). Trajectory and distance plots were generated in `experiments/`.
 
 Quantitative generalization results should be added after reviewing the evaluation output.
-![Experiment B trajectories](goal_7/experiment_b_trajectories.png)
-![Experiment B distance](goal_7/experiment_b_distance.png)
+![Experiment B trajectories](experiments/experiment_b_trajectories.png)
+![Experiment B distance](experiments/experiment_b_distance.png)
 
 **Experiment C — External disturbances**
 
 Created trajectory and distance visualizations for a wind-like disturbance experiment. The disturbance implementation requires validation so that the disturbance is incorporated before reward and termination calculations. Therefore, these plots should be treated as preliminary rather than validated robustness results.
-![Experiment C trajectory](goal_7/experiment_c_trajectory.png)
-![Experiment C distance](goal_7/experiment_c_distance.png)
+![Experiment C trajectory](experiments/experiment_c_trajectory.png)
+![Experiment C distance](experiments/experiment_c_distance.png)
 *Preliminary results: the disturbance model still needs validation, so these plots are not a confirmed robustness result.*
 ## Repository Structure
 
 ```text
 UAV_RL_PROJECT/
 │
-├── goal_1/
+├── dynamics/
 │   └── uav_dynamics.py
 │
-├── goal_2/
+├── environment/
 │   ├── uav_env.py
 │   └── test_basic.py
 │
-├── goal_3/
+├── tests/
 │   ├── test_checker.py
 │   ├── test_out_of_bounds.py
 │   ├── test_random_episodes.py
 │   ├── test_success.py
 │   └── test_time_limit.py
 │
-├── goal_4/
+├── training/
 │   ├── train_ppo.py
 │   └── uav_ppo_model.zip
 │
-├── goal_5/
+├── evaluation/
 │   └── evaluate_ppo.py
 │
-├── goal_6/
+├── visualization/
 │   ├── visualize_ppo.py
 │   └── ppo_trajectory_analysis.png
 │
-├── goal_7/
+├── experiments/
 │   ├── train_experiment_a.py
 │   ├── test_new_targets.py
 │   ├── test_disturbance.py
@@ -211,27 +211,27 @@ pip install -r requirements.txt
 Run the baseline training:
 
 ```bash
-python -m goal_4.train_ppo
+python -m training.train_ppo
 ```
 
 Evaluate the trained baseline policy:
 
 ```bash
-python -m goal_5.evaluate_ppo
+python -m evaluation.evaluate_ppo
 ```
 
 Generate the baseline trajectory visualization:
 
 ```bash
-python -m goal_6.visualize_ppo
+python -m visualization.visualize_ppo
 ```
 
 Run the additional experiments:
 
 ```bash
-python -m goal_7.train_experiment_a
-python -m goal_7.test_new_targets
-python -m goal_7.test_disturbance
+python -m experiments.train_experiment_a
+python -m experiments.test_new_targets
+python -m experiments.test_disturbance
 ```
 
 The training and experiment scripts may overwrite or generate model files and plots in their respective folders.

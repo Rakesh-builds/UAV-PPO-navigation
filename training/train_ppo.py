@@ -1,7 +1,7 @@
 
 from stable_baselines3 import PPO
 
-from goal_2.uav_env import UAVEnv
+from environment.uav_env import UAVEnv
 
 
 # 1. Create the UAV environment
@@ -28,7 +28,7 @@ model.learn(total_timesteps=20000)
 
 
 # 4. Save the trained model
-model.save("goal_4/uav_ppo_model")
+model.save("training/uav_ppo_model")
 
 
 # 5. Close the environment
